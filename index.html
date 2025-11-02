@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><script type='text/javascript' src='https://ppl-ai-code-interpreter-files.s3.amazonaws.com/kd_r8dzr8nASLIndgJBiC9_6CcBcSBITv0ikkmCu4WKuvz9yn6w2s_u27-GT-q4w2U0pjveX-rv4_fLdBzbNyjqyb7cZSpx0QDDFFBrmd2uBNREBP0EPwrtJHm_36DssfpC4SZ5q9weLPStpqiA0Gnp7MagCDFwuLml7kJHaEqA='></script>
+<head><script type='text/javascript' src='https://ppl-ai-code-interpreter-files.s3.amazonaws.com/Pk64p20Sf4K-Eyzm4kW_EbFSbCJ0Hk36DkHTyOrp3z3mgso_vgp7XxphUsk7WRNWgNd279cGcp3IV_EYai7QivJ11dTfKwQ3ca6VmcWQIbJH9Fax1aDN7n4IoAlPXfGrXdG1Q8cetbHaHZB4EvsnITIjuBA72eMzDQZdOkdqipM='></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monthly Budget Tracker</title>
@@ -166,6 +166,26 @@
             width: 200px;
             height: 200px;
             margin: 0 auto var(--space-16);
+            border-radius: 50%;
+            background: conic-gradient(
+            );
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chart-center {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: var(--color-surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 18px;
+            position: absolute;
         }
 
         .legend {
@@ -340,7 +360,9 @@
 
         <div class="chart-container">
             <div class="chart-title">Where I am spending my money</div>
-            <canvas id="donut-chart" class="donut-chart"></canvas>
+            <div class="donut-chart" id="donut-chart">
+                <div class="chart-center" id="chart-total">€2,244.50</div>
+            </div>
             <div class="legend" id="legend"></div>
         </div>
 
@@ -411,7 +433,7 @@
         const colors = ['#ff6b9d', '#c44569', '#4a69bd', '#60a3bc', '#78e08f', '#f6b93b', '#e55039', '#b71540'];
         
         let budget = {
-            total: 2655,
+            total: 3000,
             fixed: [
                 { name: 'Rent', amount: 199, icon: '🏠' },
                 { name: 'Fitness', amount: 100, icon: '💪' },
@@ -468,16 +490,6 @@
         }
 
         function drawDonutChart() {
-            const canvas = document.getElementById('donut-chart');
-            const ctx = canvas.getContext('2d');
-            const centerX = 100;
-            const centerY = 100;
-            const radius = 80;
-            const innerRadius = 50;
-
-            canvas.width = 200;
-            canvas.height = 200;
-
             const categories = [
                 { name: 'Fixed Expenses', total: budget.fixed.reduce((s, e) => s + e.amount, 0), color: '#ff6b9d' },
                 { name: 'Sinking Funds', total: budget.sinking.reduce((s, e) => s + e.amount, 0), color: '#4a69bd' },
@@ -485,33 +497,26 @@
             ];
 
             const total = categories.reduce((sum, cat) => sum + cat.total, 0);
-            let currentAngle = -Math.PI / 2;
+            
+            // Update center text
+            document.getElementById('chart-total').textContent = '€' + total.toFixed(0);
 
-            categories.forEach(cat => {
-                const sliceAngle = (cat.total / total) * 2 * Math.PI;
+            // Calculate percentages and create conic gradient
+            let currentDeg = 0;
+            const gradientParts = [];
+            
+            categories.forEach((cat, index) => {
+                const percentage = (cat.total / total) * 100;
+                const degrees = (percentage / 100) * 360;
+                const endDeg = currentDeg + degrees;
                 
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
-                ctx.arc(centerX, centerY, innerRadius, currentAngle + sliceAngle, currentAngle, true);
-                ctx.closePath();
-                ctx.fillStyle = cat.color;
-                ctx.fill();
-
-                currentAngle += sliceAngle;
+                gradientParts.push(`${cat.color} ${currentDeg}deg ${endDeg}deg`);
+                currentDeg = endDeg;
             });
 
-            // Center circle
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, innerRadius, 0, 2 * Math.PI);
-            ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--color-surface');
-            ctx.fill();
-
-            // Center text
-            ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--color-text');
-            ctx.font = 'bold 20px ' + getComputedStyle(document.body).fontFamily;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(`€${total.toFixed(0)}`, centerX, centerY);
+            // Update chart background
+            const chart = document.getElementById('donut-chart');
+            chart.style.background = `conic-gradient(${gradientParts.join(', ')})`;
 
             // Update legend
             const legend = document.getElementById('legend');
