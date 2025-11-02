@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script type='text/javascript' src='https://ppl-ai-code-interpreter-files.s3.amazonaws.com/kd_r8dzr8nASLIndgJBiC9_6CcBcSBITv0ikkmCu4WKuvz9yn6w2s_u27-GT-q4w2U0pjveX-rv4_fLdBzbNyjqyb7cZSpx0QDDFFBrmd2uBNREBP0EPwrtJHm_36DssfpC4SZ5q9weLPStpqiA0Gnp7MagCDFwuLml7kJHaEqA='></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Budget Tracker</title>
+    <style>
+        :root {
+            --color-white: rgba(255, 255, 255, 1);
+            --color-black: rgba(0, 0, 0, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-gray-400: rgba(119, 124, 124, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-300: rgba(50, 184, 198, 1);
+            --color-teal-400: rgba(45, 166, 178, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-teal-700: rgba(26, 104, 115, 1);
+            --color-red-400: rgba(255, 84, 89, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-orange-400: rgba(230, 129, 97, 1);
+            
+            --color-brown-600-rgb: 94, 82, 64;
+            --color-teal-500-rgb: 33, 128, 141;
+            --color-slate-900-rgb: 19, 52, 59;
+            
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+            
+            --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-background: var(--color-charcoal-700);
+                --color-surface: var(--color-charcoal-800);
+                --color-text: var(--color-gray-200);
+                --color-text-secondary: rgba(167, 169, 169, 0.7);
+                --color-primary: var(--color-teal-300);
+                --color-border: rgba(119, 124, 124, 0.3);
+                --color-card-border: rgba(119, 124, 124, 0.2);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background-color: var(--color-background);
+            color: var(--color-text);
+            padding: var(--space-20);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: var(--space-24);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: var(--space-8);
+        }
+
+        .month-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-16);
+            margin-bottom: var(--space-24);
+        }
+
+        .month-selector select {
+            padding: var(--space-8) var(--space-12);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            background-color: var(--color-surface);
+            color: var(--color-text);
+            font-size: 14px;
+        }
+
+        .budget-overview {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-20);
+            margin-bottom: var(--space-20);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .budget-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-12);
+        }
+
+        .budget-label {
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            font-size: 14px;
+        }
+
+        .budget-amount {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .budget-amount.positive {
+            color: var(--color-teal-500);
+        }
+
+        .budget-amount.negative {
+            color: var(--color-red-400);
+        }
+
+        .chart-container {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-20);
+            margin-bottom: var(--space-20);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            margin-bottom: var(--space-16);
+            font-size: 16px;
+        }
+
+        .donut-chart {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto var(--space-16);
+        }
+
+        .legend {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-8);
+            text-align: left;
+            max-width: 250px;
+            margin: 0 auto;
+        }
+
+        .legend-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .legend-label {
+            display: flex;
+            align-items: center;
+            gap: var(--space-8);
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .expense-section {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-20);
+            margin-bottom: var(--space-20);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-title {
+            font-weight: 600;
+            margin-bottom: var(--space-16);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+        }
+
+        .expense-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-12) 0;
+            border-bottom: 1px solid var(--color-card-border);
+        }
+
+        .expense-item:last-child {
+            border-bottom: none;
+        }
+
+        .expense-name {
+            display: flex;
+            align-items: center;
+            gap: var(--space-12);
+        }
+
+        .expense-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .expense-amount {
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: var(--space-8) var(--space-16);
+            border: none;
+            border-radius: var(--radius-base);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+        }
+
+        .add-expense-form {
+            display: none;
+            margin-top: var(--space-16);
+            padding: var(--space-16);
+            background-color: var(--color-background);
+            border-radius: var(--radius-base);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-12);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--space-8);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: var(--space-8) var(--space-12);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            background-color: var(--color-surface);
+            color: var(--color-text);
+            font-size: 14px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: var(--space-8);
+            justify-content: flex-end;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Budget Tracker</h1>
+        </div>
+
+        <div class="month-selector">
+            <label for="month-select">Month:</label>
+            <select id="month-select">
+                <option value="2025-11">November 2025</option>
+                <option value="2025-10">October 2025</option>
+                <option value="2025-09">September 2025</option>
+            </select>
+        </div>
+
+        <div class="budget-overview">
+            <div class="budget-row">
+                <span class="budget-label">Budget</span>
+                <span class="budget-amount" id="budget-total">€3,000.00</span>
+            </div>
+            <div class="budget-row">
+                <span class="budget-label">Actual</span>
+                <span class="budget-amount" id="actual-total">€0.00</span>
+            </div>
+            <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--color-card-border);">
+            <div class="budget-row">
+                <span class="budget-label" style="font-weight: 600;">Remaining</span>
+                <span class="budget-amount positive" id="remaining-total">€3,000.00</span>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">Where I am spending my money</div>
+            <canvas id="donut-chart" class="donut-chart"></canvas>
+            <div class="legend" id="legend"></div>
+        </div>
+
+        <div class="expense-section">
+            <div class="section-title">
+                <span>Fixed Expenses</span>
+                <span id="fixed-total">€779.50</span>
+            </div>
+            <div id="fixed-expenses-list"></div>
+            <button class="btn btn-secondary" onclick="toggleForm('fixed')" style="margin-top: 12px; width: 100%;">+ Add Expense</button>
+            <div id="fixed-form" class="add-expense-form">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="fixed-name" placeholder="Expense name">
+                </div>
+                <div class="form-group">
+                    <label>Amount (€)</label>
+                    <input type="number" id="fixed-amount" placeholder="0.00" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Icon</label>
+                    <input type="text" id="fixed-icon" placeholder="🏠" maxlength="2">
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-secondary" onclick="toggleForm('fixed')">Cancel</button>
+                    <button class="btn btn-primary" onclick="addExpense('fixed')">Add</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="expense-section">
+            <div class="section-title">
+                <span>Sinking Funds</span>
+                <span id="sinking-total">€733.00</span>
+            </div>
+            <div id="sinking-expenses-list"></div>
+            <button class="btn btn-secondary" onclick="toggleForm('sinking')" style="margin-top: 12px; width: 100%;">+ Add Expense</button>
+            <div id="sinking-form" class="add-expense-form">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="sinking-name" placeholder="Expense name">
+                </div>
+                <div class="form-group">
+                    <label>Amount (€)</label>
+                    <input type="number" id="sinking-amount" placeholder="0.00" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Icon</label>
+                    <input type="text" id="sinking-icon" placeholder="💰" maxlength="2">
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-secondary" onclick="toggleForm('sinking')">Cancel</button>
+                    <button class="btn btn-primary" onclick="addExpense('sinking')">Add</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="expense-section">
+            <div class="section-title">
+                <span>Your Expenses</span>
+                <span id="yours-total">€732.00</span>
+            </div>
+            <div id="yours-expenses-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const colors = ['#ff6b9d', '#c44569', '#4a69bd', '#60a3bc', '#78e08f', '#f6b93b', '#e55039', '#b71540'];
+        
+        let budget = {
+            total: 3000,
+            fixed: [
+                { name: 'Rent', amount: 199, icon: '🏠' },
+                { name: 'Fitness', amount: 100, icon: '💪' },
+                { name: 'Utilities', amount: 200.50, icon: '💡' },
+                { name: 'Internet', amount: 80, icon: '📡' },
+                { name: 'Subscriptions', amount: 200, icon: '📺' }
+            ],
+            sinking: [
+                { name: 'Travel Fund', amount: 83, icon: '✈️' },
+                { name: 'Emergency', amount: 500, icon: '🚨' },
+                { name: 'Gifts', amount: 50, icon: '🎁' },
+                { name: 'Car Insurance', amount: 100, icon: '🚗' }
+            ],
+            yours: [
+                { name: 'Groceries', amount: 350, icon: '🛒' },
+                { name: 'Dining Out', amount: 150, icon: '🍔' },
+                { name: 'Entertainment', amount: 100, icon: '🎬' },
+                { name: 'Shopping', amount: 132, icon: '🛍️' }
+            ]
+        };
+
+        function renderExpenses(category, containerId, totalId) {
+            const container = document.getElementById(containerId);
+            const expenses = budget[category];
+            
+            container.innerHTML = expenses.map(expense => `
+                <div class="expense-item">
+                    <div class="expense-name">
+                        <div class="expense-icon" style="background-color: ${colors[Math.floor(Math.random() * colors.length)]}20;">
+                            ${expense.icon}
+                        </div>
+                        <span>${expense.name}</span>
+                    </div>
+                    <span class="expense-amount">€${expense.amount.toFixed(2)}</span>
+                </div>
+            `).join('');
+
+            const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+            document.getElementById(totalId).textContent = `€${total.toFixed(2)}`;
+        }
+
+        function updateTotals() {
+            const fixedTotal = budget.fixed.reduce((sum, e) => sum + e.amount, 0);
+            const sinkingTotal = budget.sinking.reduce((sum, e) => sum + e.amount, 0);
+            const yoursTotal = budget.yours.reduce((sum, e) => sum + e.amount, 0);
+            const actualTotal = fixedTotal + sinkingTotal + yoursTotal;
+            const remaining = budget.total - actualTotal;
+
+            document.getElementById('actual-total').textContent = `€${actualTotal.toFixed(2)}`;
+            document.getElementById('remaining-total').textContent = `€${remaining.toFixed(2)}`;
+            
+            const remainingEl = document.getElementById('remaining-total');
+            remainingEl.className = `budget-amount ${remaining >= 0 ? 'positive' : 'negative'}`;
+        }
+
+        function drawDonutChart() {
+            const canvas = document.getElementById('donut-chart');
+            const ctx = canvas.getContext('2d');
+            const centerX = 100;
+            const centerY = 100;
+            const radius = 80;
+            const innerRadius = 50;
+
+            canvas.width = 200;
+            canvas.height = 200;
+
+            const categories = [
+                { name: 'Fixed Expenses', total: budget.fixed.reduce((s, e) => s + e.amount, 0), color: '#ff6b9d' },
+                { name: 'Sinking Funds', total: budget.sinking.reduce((s, e) => s + e.amount, 0), color: '#4a69bd' },
+                { name: 'Your Expenses', total: budget.yours.reduce((s, e) => s + e.amount, 0), color: '#78e08f' }
+            ];
+
+            const total = categories.reduce((sum, cat) => sum + cat.total, 0);
+            let currentAngle = -Math.PI / 2;
+
+            categories.forEach(cat => {
+                const sliceAngle = (cat.total / total) * 2 * Math.PI;
+                
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                ctx.arc(centerX, centerY, innerRadius, currentAngle + sliceAngle, currentAngle, true);
+                ctx.closePath();
+                ctx.fillStyle = cat.color;
+                ctx.fill();
+
+                currentAngle += sliceAngle;
+            });
+
+            // Center circle
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, innerRadius, 0, 2 * Math.PI);
+            ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--color-surface');
+            ctx.fill();
+
+            // Center text
+            ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--color-text');
+            ctx.font = 'bold 20px ' + getComputedStyle(document.body).fontFamily;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`€${total.toFixed(0)}`, centerX, centerY);
+
+            // Update legend
+            const legend = document.getElementById('legend');
+            legend.innerHTML = categories.map(cat => `
+                <div class="legend-item">
+                    <div class="legend-label">
+                        <div class="legend-color" style="background-color: ${cat.color};"></div>
+                        <span>${cat.name}</span>
+                    </div>
+                    <span style="font-weight: 600;">€${cat.total.toFixed(2)}</span>
+                </div>
+            `).join('');
+        }
+
+        function toggleForm(category) {
+            const form = document.getElementById(`${category}-form`);
+            form.style.display = form.style.display === 'none' || form.style.display === '' ? 'block' : 'none';
+        }
+
+        function addExpense(category) {
+            const name = document.getElementById(`${category}-name`).value;
+            const amount = parseFloat(document.getElementById(`${category}-amount`).value);
+            const icon = document.getElementById(`${category}-icon`).value || '💰';
+
+            if (name && amount) {
+                budget[category].push({ name, amount, icon });
+                renderExpenses(category, `${category}-expenses-list`, `${category}-total`);
+                updateTotals();
+                drawDonutChart();
+                toggleForm(category);
+                
+                // Clear form
+                document.getElementById(`${category}-name`).value = '';
+                document.getElementById(`${category}-amount`).value = '';
+                document.getElementById(`${category}-icon`).value = '';
+            }
+        }
+
+        // Initialize
+        renderExpenses('fixed', 'fixed-expenses-list', 'fixed-total');
+        renderExpenses('sinking', 'sinking-expenses-list', 'sinking-total');
+        renderExpenses('yours', 'yours-expenses-list', 'yours-total');
+        updateTotals();
+        drawDonutChart();
+    </script>
+</body>
+</html>
